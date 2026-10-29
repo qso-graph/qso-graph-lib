@@ -58,3 +58,11 @@ def test_a_command_if_any_is_named_for_the_package() -> None:
         assert cmd == name or cmd.startswith(f"{name}-"), (
             f"{cmd} is neither {name} nor prefixed with it"
         )
+
+
+def test_the_package_says_it_is_typed() -> None:
+    """Without py.typed, mypy treats every import from this package as Any in the packages
+    that use it: qrz-mcp's write_adi() came back Any and failed its strict check."""
+    from importlib.resources import files
+
+    assert files("qso_graph_lib").joinpath("py.typed").is_file()
