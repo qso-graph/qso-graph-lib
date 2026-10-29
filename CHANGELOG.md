@@ -28,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     without rewriting the values.
   - `write` checks field names and always opens a Header with text, as a Header that begins
     with `<` is, by the specification, no Header.
+- **`py.typed`**: the package says it is typed, so mypy checks the packages that use it
+  against its types instead of treating every import as `Any`.
 
 ## [0.1.0] - 2026-10-29
 
