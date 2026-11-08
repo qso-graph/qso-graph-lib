@@ -2,7 +2,7 @@
 
 [![PyPI](https://img.shields.io/pypi/v/qso-graph-lib)](https://pypi.org/project/qso-graph-lib/)
 [![Python](https://img.shields.io/pypi/pyversions/qso-graph-lib)](https://pypi.org/project/qso-graph-lib/)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 The code QSO Graph's Python packages share, in one place, so it is written and tested once. Standard library only: no dependencies.
 
@@ -63,4 +63,4 @@ This package is part of [qso-graph](https://github.com/qso-graph), tools for ama
 
 ## License
 
-[GPLv3](LICENSE)
+[GPL-3.0-or-later](LICENSE)
