@@ -22,7 +22,7 @@ The JT modules are used by [qso-graph-sim](https://github.com/qso-graph/qso-grap
 uv add qso-graph-lib
 ```
 
-Or `pip install qso-graph-lib`. It has no command of its own; it is imported.
+It has no command of its own; it is imported.
 
 ## Example
 
