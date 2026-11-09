@@ -7,7 +7,7 @@ requires-python = ">=3.11"
 authors = [{name = "KI7MT", email = "maintainers@qso-graph.io"}]
 readme = "README.md"
 keywords = [
-    "amateur-radio", "ham-radio", "wsjt-x", "ft8", "jtdx", "udp", "library",
+    "amateur-radio", "ham-radio", "wsjt-x", "ft8", "udp", "library",
 ]
 classifiers = [
     "Development Status :: 3 - Alpha",
