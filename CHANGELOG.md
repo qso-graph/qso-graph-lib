@@ -7,8 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Changed
+## [0.2.2] - 2026-11-09
 
+### Changed
 
 - Licensed GPL-3.0-or-later, the same as every QSO Graph project.
 - AGENTS.md and CLAUDE.md: the organization's shared agent guide, and this repository's own.
