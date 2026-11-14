@@ -1,4 +1,4 @@
-"""ADI reading and writing. See the package docstring for the rules, and ADIF 3.1.7 IV.A."""
+"""ADI reading and writing. See the package docstring for the rules, and ADIF 3.1.8 IV.A."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from collections.abc import Iterable, Iterator, Mapping
 from dataclasses import dataclass, field
 
 # A Data-Specifier's tag. The field name may not contain a comma, colon, angle
-# bracket or brace (ADIF 3.1.7, Field names); the length is at most nine digits,
+# bracket or brace (ADIF 3.1.8, Field names); the length is at most nine digits,
 # so a forged "<CALL:99999...9>" cannot make a huge integer; the type indicator is
 # one letter.
 _NAME = r"(?P<name>[^\s:<>,{}]+)"
@@ -149,7 +149,7 @@ def _header_end(text: str, g: _Grammar, problems: list[Problem]) -> tuple[int, i
     if first_eor is not None and first_eor.start() < eoh.start():
         return 0, 0  # an <EOH> after a record is not a Header's end
     if g.opener.match(text, 0):
-        # ADIF 3.1.7 IV.A.3: a file whose first character is "<" has no Header. Many
+        # ADIF 3.1.8 IV.A.3: a file whose first character is "<" has no Header. Many
         # writers emit "<ADIF_VER:5>3.1.7<EOH>" anyway, and reading those fields
         # as the first QSO's would be the worse mistake.
         problems.append(Problem(0, "the file starts with '<', which ADIF says means no "
@@ -227,7 +227,7 @@ def read_file(
 
     Opening an ADI file in Python's text mode translates CR LF to LF, which shortens
     every multi-line value by a character a line and breaks its declared length: on
-    ADIF 3.1.7's own test file that is four fields. So the file is read with no newline
+    ADIF 3.1.8's own test file that is four fields. So the file is read with no newline
     translation. Bytes that are not valid in ``encoding`` become U+FFFD, one each.
     """
     with open(path, encoding=encoding, errors="replace", newline="") as f:
@@ -251,7 +251,7 @@ def write(
 ) -> str:
     """ADI text for ``records``, one per line, with a Header when one is given.
 
-    A Header must not begin with "<" (ADIF 3.1.7 IV.A.3: a file that does has no
+    A Header must not begin with "<" (ADIF 3.1.8 IV.A.3: a file that does has no
     Header), so one is always opened with text: ``header_text``, or a default.
     """
     out: list[str] = []

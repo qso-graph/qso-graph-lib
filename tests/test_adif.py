@@ -1,4 +1,4 @@
-"""ADI reading and writing, against ADIF 3.1.7's own examples and the inputs that broke
+"""ADI reading and writing, against ADIF 3.1.8's own examples and the inputs that broke
 the fleet's six parsers on 2026-10-29."""
 
 from __future__ import annotations
@@ -7,7 +7,7 @@ import pytest
 
 from qso_graph_lib.adif import iter_records, read, write
 
-# ADIF 3.1.7, IV.A.7 "Sample ADI File", as printed in the specification.
+# ADIF 3.1.8, IV.A.7 "Sample ADI File", as printed in the specification.
 SPEC_SAMPLE = """Generated on 2011-11-22 at 02:15:23Z for WN4AZY
 <adif_ver:5>3.0.5
 <programid:7>monolog

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **`qso_graph_lib.adif` follows ADIF 3.1.8** (released 2026-10-12), whose ADI rules (IV.A) are
+  unchanged from 3.1.7. The reader passes ADIF 3.1.8's own test files as well as 3.1.7's: all
+  6,202 QSOs of `ADIF_318_test_QSOs` read exactly as its ADX twin has them, with no problem
+  reported. The files are in `tests/adif318/`, beside `tests/adif317/`, and the test runs
+  against each.
+
 ## [0.2.2] - 2026-11-09
 
 ### Changed
