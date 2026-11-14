@@ -1,7 +1,7 @@
-"""ADIF 3.1.7's own test files: reading the ADI must give exactly the ADX's QSOs.
+"""ADIF's own test files, each version's: reading the ADI must give exactly the ADX's QSOs.
 
 The floor for the reader (KI7MT, 2026-10-29): always pass the ADIF project's version tests.
-See tests/adif317/README.md for where the files come from.
+See tests/adif317/README.md and tests/adif318/README.md for where the files come from.
 """
 
 from __future__ import annotations
@@ -14,12 +14,23 @@ import pytest
 
 from qso_graph_lib.adif import read, read_file, write
 
-HERE = Path(__file__).parent / "adif317"
-ADI = HERE / "ADIF_317_test_QSOs_2026_03_22.adi"
-ADX = HERE / "ADIF_317_test_QSOs_2026_03_22.adx"
-SHA256 = {
-    ADI: "7d5e5201a1b34113e098aeb0ba61d7e63eeba17a7f3edc2d37d29b52828d1502",
-    ADX: "c9a09c0603144479165469a0054f9af338fc81731ba42f20070b998700a3d271",
+HERE = Path(__file__).parent
+# Each version's files, their SHA-256 and how many QSOs they hold.
+VERSIONS = {
+    "3.1.7": (
+        HERE / "adif317" / "ADIF_317_test_QSOs_2026_03_22.adi",
+        "7d5e5201a1b34113e098aeb0ba61d7e63eeba17a7f3edc2d37d29b52828d1502",
+        HERE / "adif317" / "ADIF_317_test_QSOs_2026_03_22.adx",
+        "c9a09c0603144479165469a0054f9af338fc81731ba42f20070b998700a3d271",
+        6197,
+    ),
+    "3.1.8": (
+        HERE / "adif318" / "ADIF_318_test_QSOs_2026_10_12.adi",
+        "113369e5c226f090e2caf7db38b3bc6c642054ec4ae8f5b30101a3579a7623b1",
+        HERE / "adif318" / "ADIF_318_test_QSOs_2026_10_12.adx",
+        "81f0ab15f246e483b930543f1a3efd65aa3b1a880e772e76a2f7402fb38e3eeb",
+        6202,
+    ),
 }
 
 
@@ -36,24 +47,25 @@ def _adx_name(el: ET.Element) -> str:
     return el.tag.upper()
 
 
-@pytest.fixture(scope="module")
-def files() -> tuple[str, ET.Element]:
-    for path, digest in SHA256.items():
+@pytest.fixture(scope="module", params=sorted(VERSIONS))
+def files(request) -> tuple[str, ET.Element, Path, int]:
+    adi_path, adi_sha, adx_path, adx_sha, count = VERSIONS[request.param]
+    for path, digest in ((adi_path, adi_sha), (adx_path, adx_sha)):
         # The files are ADIF's, unchanged; and the XML is parsed only once it is known to be.
         assert hashlib.sha256(path.read_bytes()).hexdigest() == digest, path.name
-    with open(ADI, encoding="utf-8", newline="") as f:  # line ends as written
+    with open(adi_path, encoding="utf-8", newline="") as f:  # line ends as written
         adi = f.read()
-    return adi, ET.parse(ADX).getroot()
+    return adi, ET.parse(adx_path).getroot(), adi_path, count
 
 
 def test_every_qso_reads_exactly_as_the_adx_has_it(files):
-    adi, adx = files
+    adi, adx, _, count = files
     doc = read(adi)
     expected = [
         {_adx_name(e): _crlf(e.text or "") for e in rec} for rec in adx.iter("RECORD")
     ]
     assert doc.problems == []
-    assert len(doc.records) == len(expected) == 6197
+    assert len(doc.records) == len(expected) == count
 
     for i, (rec, want) in enumerate(zip(doc.records, expected)):
         got = {k: _crlf(v) for k, v in rec.fields.items()}
@@ -66,7 +78,7 @@ def test_every_qso_reads_exactly_as_the_adx_has_it(files):
 
 
 def test_the_header_reads_as_the_adx_has_it(files):
-    adi, adx = files
+    adi, adx, _, _ = files
     doc = read(adi)
     header = adx.find("HEADER")
     assert header is not None
@@ -82,7 +94,7 @@ def test_the_header_reads_as_the_adx_has_it(files):
 
 
 def test_writing_the_test_file_reads_back_the_same(files):
-    adi, _ = files
+    adi, _, _, _ = files
     doc = read(adi)
     again = read(write((r.fields for r in doc.records), header=doc.header))
     assert again.problems == []
@@ -93,8 +105,8 @@ def test_writing_the_test_file_reads_back_the_same(files):
 def test_read_file_keeps_line_ends_and_text_mode_would_not(files):
     """Text mode turns CR LF into LF and breaks multi-line fields' lengths; read_file
     does not. Both halves asserted, so the trap stays proven."""
-    adi, _ = files
-    assert read_file(ADI).problems == []
-    assert [r.fields for r in read_file(ADI).records] == [r.fields for r in read(adi).records]
-    translated = ADI.read_text(encoding="utf-8")  # what open(path) in text mode gives
+    adi, _, path, _ = files
+    assert read_file(path).problems == []
+    assert [r.fields for r in read_file(path).records] == [r.fields for r in read(adi).records]
+    translated = path.read_text(encoding="utf-8")  # what open(path) in text mode gives
     assert read(translated).problems, "text mode should have broken a multi-line length"

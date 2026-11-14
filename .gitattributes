@@ -1,3 +1,5 @@
 # ADIF's test files, byte for byte: the ADI has CR LF line ends, and tests check SHA-256.
 tests/adif317/*.adi -text
 tests/adif317/*.adx -text
+tests/adif318/*.adi -text
+tests/adif318/*.adx -text

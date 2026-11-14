@@ -1,4 +1,4 @@
-"""ADIF's ADI format, read and written as ADIF 3.1.7 defines it.
+"""ADIF's ADI format, read and written as ADIF 3.1.8 defines it.
 
 ``read`` and ``iter_records`` take ADI text and return its header and records;
 ``read_file`` reads a file without translating its line ends, which text mode would;
@@ -7,7 +7,7 @@
 on 2026-10-29 the same input lost a field in one, merged the header into the
 first QSO in another, and ran two records together in five of six.
 
-The rules are ADIF's own (ADIF 3.1.7, section IV.A, "ADI File Format"):
+The rules are ADIF's own (ADIF 3.1.8, section IV.A, "ADI File Format"; unchanged from 3.1.7):
 
 - A Data-Specifier is ``<F:L:T>D``: a case-independent field name ``F``, a data
   length ``L``, an optional case-insensitive data type indicator ``T``, then

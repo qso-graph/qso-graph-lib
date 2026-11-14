@@ -10,7 +10,7 @@ The code QSO Graph's Python packages share, in one place, so it is written and t
 
 | Module | What |
 |---|---|
-| `qso_graph_lib.adif` | ADIF's ADI format, read and written as [ADIF 3.1.7](https://adif.org.uk/317/ADIF_317.htm) defines it. Passes ADIF's own 3.1.7 test files; non-compliant input real logs contain is repaired where it can be and reported in `Document.problems`, never silently |
+| `qso_graph_lib.adif` | ADIF's ADI format, read and written as [ADIF 3.1.8](https://adif.org.uk/318/ADIF_318.htm) defines it. Passes ADIF's own 3.1.8 and 3.1.7 test files; non-compliant input real logs contain is repaired where it can be and reported in `Document.problems`, never silently |
 | `qso_graph_lib.jt.protocol` | WSJT-X's UDP messages, encoded and decoded: Heartbeat, Status, Decode, WSPRDecode, Clear, Close, Replay and the rest, schema 3, written to WSJT-X's own [`Network/NetworkMessage.hpp`](https://github.com/WSJTX/wsjtx/blob/master/Network/NetworkMessage.hpp) |
 | `qso_graph_lib.jt.alltxt` | WSJT-X's `ALL.TXT`, the log of every decode, read into cycles |
 
@@ -45,7 +45,7 @@ for record in doc.records:
 for problem in doc.problems:                # what broke ADIF's rules, and what was done
     print(problem.offset, problem.message)
 
-text = adif.write(records, header={"ADIF_VER": "3.1.7", "PROGRAMID": "my-app"})
+text = adif.write(records, header={"ADIF_VER": "3.1.8", "PROGRAMID": "my-app"})
 ```
 
 ## Development
