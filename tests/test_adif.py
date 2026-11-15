@@ -155,6 +155,40 @@ def test_a_byte_order_mark_is_not_a_header():
     assert doc.header == {} and doc.records[0].fields == {"CALL": "K1ABC"}
 
 
+@pytest.mark.parametrize("text", [
+    "<call:5>Q2XYZ <gridsquare:4 EM73 <mode:3>FT8 <band:3>40m <eor>",
+    "<call:5>Q2XYZ <gridsquare:4 EM73<eor>",
+    "<call:5>Q2XYZ <gridsquare:4 EM73",
+])
+def test_a_tag_with_no_closing_bracket_is_reported(text):
+    """WSJT-X skips it with no message, so the field is lost silently (WSJT-X issue 170)."""
+    doc = read(text)
+    assert "GRIDSQUARE" not in doc.records[0].fields
+    gone = [p for p in doc.problems if "no closing '>'" in p.message]
+    assert len(gone) == 1 and gone[0].offset == text.index("<gridsquare")
+    assert gone[0].message.startswith("GRIDSQUARE:")
+
+
+def test_an_unclosed_tag_after_the_last_record_is_reported():
+    doc = read("<call:5>Q2XYZ<eor><gridsquare:4 EM73")
+    assert [r.fields for r in doc.records] == [{"CALL": "Q2XYZ"}]
+    assert any("no closing '>'" in p.message for p in doc.problems)
+
+
+def test_an_angle_bracket_that_is_not_tag_shaped_is_not_an_unclosed_tag():
+    doc = read("<call:5>K1ABC<comment:9>a<b and c<eor>")
+    assert doc.records[0].fields == {"CALL": "K1ABC", "COMMENT": "a<b and c"}
+    assert doc.problems == []
+    assert read("<call:5>K1ABC note <b and c <eor>").problems == []
+
+
+def test_an_escaped_tag_with_no_closing_bracket_is_reported():
+    doc = read("&lt;call:5&gt;Q2XYZ &lt;gridsquare:4 EM73 &lt;eor&gt;", escaped_markers=True)
+    assert doc.records[0].fields == {"CALL": "Q2XYZ"}
+    assert [p.message for p in doc.problems] == [
+        "GRIDSQUARE: the tag has no closing '>'; the field is skipped"]
+
+
 def test_a_huge_declared_length_is_not_a_data_specifier():
     # Nine digits at most: a forged length cannot become an enormous integer.
     assert read("<CALL:9999999999>K1ABC<EOR>").records == []

@@ -22,6 +22,13 @@ _LITERAL_EOH = re.compile(r"<eoh>", re.IGNORECASE)
 _ESCAPED = re.compile(r"(?:<|&lt;)" + _NAME.replace("<>", "<>&;") + _TAIL + r"(?:>|&gt;)")
 _ESCAPED_EOR = re.compile(r"(?:<|&lt;)eor(?:>|&gt;)", re.IGNORECASE)
 _ESCAPED_EOH = re.compile(r"(?:<|&lt;)eoh(?:>|&gt;)", re.IGNORECASE)
+# A tag that names a field and its length but is never closed: no ">" before the next
+# tag or the end. Its field cannot be read, but it is reported, never dropped
+# silently. "<" inside data that is not tag-shaped ("a<b and c") is not one.
+_UNCLOSED = re.compile(r"<" + _NAME + r":\d+(?::[A-Za-z])?(?=[^<>]*(?:<|\Z))")
+_ESCAPED_UNCLOSED = re.compile(
+    r"(?:<|&lt;)" + _NAME.replace("<>", "<>&;") + r":\d+(?::[A-Za-z])?"
+    r"(?=(?:(?!&gt;|&lt;)[^<>])*(?:<|&lt;|\Z))")
 _OPENER = re.compile(r"<")
 _ESCAPED_OPENER = re.compile(r"<|&lt;")
 _WHITESPACE = re.compile(r"\s*")
@@ -63,6 +70,7 @@ class _Grammar:
         self.eor = _ESCAPED_EOR if escaped else _LITERAL_EOR
         self.eoh = _ESCAPED_EOH if escaped else _LITERAL_EOH
         self.opener = _ESCAPED_OPENER if escaped else _OPENER
+        self.unclosed = _ESCAPED_UNCLOSED if escaped else _UNCLOSED
 
 
 def _resumes(text: str, at: int, end: int, g: _Grammar) -> bool:
@@ -132,6 +140,11 @@ def _specifiers(
             continue
         spec = g.spec.match(text, at, end)
         if spec is None:
+            unclosed = g.unclosed.match(text, at, end)
+            if unclosed is not None:
+                name = unclosed.group("name").upper()
+                problems.append(Problem(at, f"{name}: the tag has no closing '>'; "
+                                            "the field is skipped"))
             pos = m.end()  # a "<" that starts nothing: ignored text
             continue
         name = spec.group("name").upper()

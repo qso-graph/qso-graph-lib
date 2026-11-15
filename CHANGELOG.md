@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **A tag that is never closed is reported, not dropped silently.** In
+  `<call:5>Q2XYZ <gridsquare:4 EM73 <mode:3>FT8 <eor>`, `<gridsquare:4` has no `>`, so its
+  field cannot be read. The reader skipped it, as WSJT-X does, and `Document.problems` said
+  nothing. It now reports `GRIDSQUARE: the tag has no closing '>'; the field is skipped` at the
+  tag's offset, in literal and escaped markers alike. A `<` in data that is not tag-shaped
+  (`a<b and c`) still reads clean.
+
 ### Changed
 
 - **`qso_graph_lib.adif` follows ADIF 3.1.8** (released 2026-10-12), whose ADI rules (IV.A) are
